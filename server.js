@@ -1,7 +1,10 @@
 // Create express app
 const express = require("express")
+const cors = require("cors")
 const app = express()
 const db = require("./database.js")
+
+app.use(cors())
 
 // Server port
 const HTTP_PORT = 8000
