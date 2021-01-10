@@ -30,6 +30,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           db.run(insert, dbObject.object3)
           db.run(insert, dbObject.object4)
           db.run(insert, dbObject.object5)
+          db.run(insert, dbObject.object6)
         }
       })
   }

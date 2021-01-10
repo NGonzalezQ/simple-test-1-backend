@@ -1,7 +1,7 @@
 // let exampleImage = document.getElementById("Example").src = "/src/exampleImage.png"
 let exampleImage = "Example Image"
 let object1 = [
-  "Zapatillas Adidas",
+  "Zapatillas",
   "Adidas",
   exampleImage,
   "Zapatillas deportivas",
@@ -25,7 +25,7 @@ let object3 = [
 ]
 
 let object4 = [
-  "Zapatillas Skechers",
+  "Zapatillas",
   "Skechers",
   exampleImage,
   "Zapatillas deportivas",
@@ -40,8 +40,17 @@ let object5 = [
   "1800"
 ]
 
+let object6 = [
+  "Pantalones",
+  "Adidas",
+  exampleImage,
+  "Pantalones de ejercicio para mujer",
+  "16500"
+]
+
 exports.object1 = object1
 exports.object2 = object2
 exports.object3 = object3
 exports.object4 = object4
 exports.object5 = object5
+exports.object6 = object6

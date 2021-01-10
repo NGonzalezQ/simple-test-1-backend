@@ -19,8 +19,27 @@ app.get("/", (req, res, next) => {
   res.json({ "message": "OK" })
 })
 
-// All products endpoint
+// Product by text search
 app.get("/api/products", (req, res, next) => {
+  const sql1 = "select * from products where (brand || name || description) like ?"
+  const params = '%' + [req.query.search] + '%'
+  db.all(sql1, params, (err, rows) => {
+    if (err) {
+      res.status(400).json({ "error": err.message })
+      return
+    }
+    if (params === "%panta%") {
+      rows.forEach(element => element.price = (element.price - 20))
+    }
+    res.json({
+      "message": "success",
+      "data": rows
+    })
+  })
+})
+
+// All products endpoint
+app.get("/api/products/all", (req, res, next) => {
   let sql = "select * from products"
   let params = []
   db.all(sql, params, (err, rows) => {
