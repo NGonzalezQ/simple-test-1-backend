@@ -7,7 +7,7 @@ const db = require("./database.js")
 app.use(cors())
 
 // Server port
-const HTTP_PORT = 8000
+const PORT = process.env.PORT || 8000
 
 // Function that checks if the string inserted is a palindrome
 const isPalindrome = (str) => {
@@ -24,8 +24,8 @@ const discountPrice = (price) => {
 }
 
 // Start server
-app.listen(HTTP_PORT, () => {
-  console.log(`Server running on port ${HTTP_PORT}`)
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
 })
 
 // Root endpoint
