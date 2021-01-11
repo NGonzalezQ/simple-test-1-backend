@@ -9,6 +9,18 @@ app.use(cors())
 // Server port
 const HTTP_PORT = 8000
 
+const isPalindrome = (str) => {
+  return (
+    str.replace(/[\W_]/g, '').toLowerCase() ===
+    str.replace(/[\W_]/g, '').toLowerCase().split('').reverse().join('')
+  )
+}
+
+const discountPrice = (price) => {
+  let discountedPrice = ((price * 20) / 100)
+  return price - discountedPrice
+}
+
 // Start server
 app.listen(HTTP_PORT, () => {
   console.log(`Server running on port ${HTTP_PORT}`)
@@ -21,20 +33,30 @@ app.get("/", (req, res, next) => {
 
 // Product by text search
 app.get("/api/products", (req, res, next) => {
-  const sql1 = "select * from products where (brand || name || description) like ?"
+  const sql = "select * from products where (brand || description) like ?"
   const params = '%' + [req.query.search] + '%'
-  db.all(sql1, params, (err, rows) => {
+  db.all(sql, params, (err, rows) => {
     if (err) {
       res.status(400).json({ "error": err.message })
       return
     }
-    if (params === "%panta%") {
-      rows.forEach(element => element.price = (element.price - 20))
+
+    if (params.length < 6) {
+      res.status(400).json({ "error": "Search must be at least 3 characters long" })
+      return
+    } else if (rows.length < 1) {
+      res.status(400).json({ "error": "No results found" })
+      return
+    } else {
+      if (isPalindrome(params) === true) {
+        rows.forEach(element => element.price = discountPrice(element.price))
+      }
+
+      res.json({
+        "message": "success",
+        "data": rows
+      })
     }
-    res.json({
-      "message": "success",
-      "data": rows
-    })
   })
 })
 
@@ -47,6 +69,7 @@ app.get("/api/products/all", (req, res, next) => {
       res.status(400).json({ "error": err.message })
       return
     }
+
     res.json({
       "message": "success",
       "data": rows
@@ -57,16 +80,25 @@ app.get("/api/products/all", (req, res, next) => {
 // Product by id endpoint
 app.get("/api/products/:id", (req, res, next) => {
   let sql = "select * from products where id = ?"
-  let params = [req.params.id]
+  let params = req.params.id
   db.get(sql, params, (err, row) => {
     if (err) {
       res.status(400).json({ "error": err.message })
       return
     }
-    res.json({
-      "message": "success",
-      "data": row
-    })
+
+    if (row) {
+      if (isPalindrome(params) === true && row) {
+        row.price = discountPrice(row.price)
+      }
+
+      res.json({
+        "message": "success",
+        "data": row
+      })
+    } else {
+      res.status(400).json({ "error": "Product ID not found" })
+    }
   })
 })
 
