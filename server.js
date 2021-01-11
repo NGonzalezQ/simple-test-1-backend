@@ -9,6 +9,7 @@ app.use(cors())
 // Server port
 const HTTP_PORT = 8000
 
+// Function that checks if the string inserted is a palindrome
 const isPalindrome = (str) => {
   return (
     str.replace(/[\W_]/g, '').toLowerCase() ===
@@ -16,6 +17,7 @@ const isPalindrome = (str) => {
   )
 }
 
+// Function to reduce the price of a product by 20%
 const discountPrice = (price) => {
   let discountedPrice = ((price * 20) / 100)
   return price - discountedPrice

@@ -1,5 +1,4 @@
 let sqlite3 = require('sqlite3').verbose()
-let md5 = require('md5')
 const dbObject = require("./exampleData")
 
 const DBSOURCE = "db.sqlite"
@@ -15,7 +14,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       id INTEGER PRIMARY KEY,
       name text,
       brand text,
-      image BLOB,
+      image text,
       description text,
       price INTEGER
     )`,

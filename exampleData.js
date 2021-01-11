@@ -1,3 +1,4 @@
+// Series of arrays created as example data for the database
 const object1 = [
   1,
   "Zapatillas",
