@@ -11,11 +11,11 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
   } else {
     console.log("Connected to the SQLite database")
     db.run(`CREATE TABLE products (
-      id INTEGER PRIMARY KEY,
-      name text,
-      brand text,
-      image text,
-      description text,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      brand TEXT,
+      image TEXT,
+      description TEXT,
       price INTEGER
     )`,
       (err) => {
@@ -24,17 +24,9 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         } else {
           // Table just created, creating some rows
           let insert = 'INSERT INTO products (id, name, brand, image, description, price) VALUES (?, ?, ?, ?, ?, ?)'
-          db.run(insert, dbObject.object1)
-          db.run(insert, dbObject.object2)
-          db.run(insert, dbObject.object3)
-          db.run(insert, dbObject.object4)
-          db.run(insert, dbObject.object5)
-          db.run(insert, dbObject.object6)
-          db.run(insert, dbObject.object7)
-          db.run(insert, dbObject.object8)
-          db.run(insert, dbObject.object9)
-          db.run(insert, dbObject.object10)
-          db.run(insert, dbObject.object11)
+          dbObject.objects.forEach((object) => {
+            db.run(insert, object)
+          })
         }
       })
   }
