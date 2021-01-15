@@ -23,8 +23,12 @@ const isPalindrome = (str) => {
 
 // Function to reduce the price of a product by 20%
 const discountPrice = (price) => {
-  const discountedPrice = ((price * 20) / 100)
-  return price - discountedPrice
+  if (isNaN(price)) {
+    return price
+  } else {
+    const discountedPrice = ((price * 20) / 100)
+    return price - discountedPrice
+  }
 }
 
 // Start server
@@ -143,7 +147,7 @@ app.post("/api/products/add", (req, res, next) => {
     }
 
     res.json({
-      "message": "success",
+      "message": "Product added successfully",
       "data": data,
       "id": this.lastID
     })
@@ -184,7 +188,7 @@ app.patch("/api/products/:id", (req, res, next) => {
     }
 
     res.json({
-      message: "success",
+      "message": "Product edited successfully",
       data: data,
       changes: this.changes
     })
@@ -203,7 +207,7 @@ app.delete("/api/products/:id", (req, res, next) => {
     }
 
     res.json({
-      "message": "deleted",
+      "message": "Product deleted",
       changes: this.changes
     })
   })
