@@ -3,8 +3,12 @@ const express = require("express")
 const cors = require("cors")
 const app = express()
 const db = require("./database.js")
+const bodyParser = require("body-parser")
+const dbObject = require("./exampleData")
 
 app.use(cors())
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 // Server port
 const PORT = process.env.PORT || 8000
@@ -19,8 +23,12 @@ const isPalindrome = (str) => {
 
 // Function to reduce the price of a product by 20%
 const discountPrice = (price) => {
-  let discountedPrice = ((price * 20) / 100)
-  return price - discountedPrice
+  if (isNaN(price)) {
+    return price
+  } else {
+    const discountedPrice = ((price * 20) / 100)
+    return price - discountedPrice
+  }
 }
 
 // Start server
@@ -35,7 +43,7 @@ app.get("/", (req, res, next) => {
 
 // Product by text search
 app.get("/api/products", (req, res, next) => {
-  const sql = "select * from products where (brand || description) like ?"
+  const sql = "SELECT * FROM products WHERE (brand || description) LIKE ?"
   const params = '%' + [req.query.search] + '%'
   db.all(sql, params, (err, rows) => {
     if (err) {
@@ -64,8 +72,8 @@ app.get("/api/products", (req, res, next) => {
 
 // All products endpoint
 app.get("/api/products/all", (req, res, next) => {
-  let sql = "select * from products"
-  let params = []
+  const sql = "SELECT * FROM products"
+  const params = []
   db.all(sql, params, (err, rows) => {
     if (err) {
       res.status(400).json({ "error": err.message })
@@ -81,8 +89,8 @@ app.get("/api/products/all", (req, res, next) => {
 
 // Product by id endpoint
 app.get("/api/products/:id", (req, res, next) => {
-  let sql = "select * from products where id = ?"
-  let params = req.params.id
+  const sql = "SELECT * FROM products WHERE id = ?"
+  const params = req.params.id
   db.get(sql, params, (err, row) => {
     if (err) {
       res.status(400).json({ "error": err.message })
@@ -101,6 +109,107 @@ app.get("/api/products/:id", (req, res, next) => {
     } else {
       res.status(400).json({ "error": "Product ID not found" })
     }
+  })
+})
+
+// Create new product
+app.post("/api/products/add", (req, res, next) => {
+  const errors = []
+  if (!req.body.name) {
+    errors.push("No name specified")
+  }
+
+  if (!req.body.brand) {
+    errors.push("No brand specified")
+  }
+
+  if (!req.body.description) {
+    errors.push("No description specified")
+  }
+
+  if (!req.body.price) {
+    errors.push("No price specified")
+  }
+
+  const data = {
+    name: req.body.name,
+    brand: req.body.brand,
+    image: req.body.image,
+    description: req.body.description,
+    price: req.body.price
+  }
+  const sql = 'INSERT INTO products (name, brand, image, description, price) VALUES (?, ?, ?, ?, ?)'
+  const params = [data.name, data.brand, data.image, data.description, data.price]
+
+  db.run(sql, params, function (err, result) {
+    if (err) {
+      res.status(400).json({ "error": err.message })
+    }
+
+    res.json({
+      "message": "Product added successfully",
+      "data": data,
+      "id": this.lastID
+    })
+  })
+})
+
+// Update a product
+app.patch("/api/products/:id", (req, res, next) => {
+  const data = {
+    name: req.body.name,
+    brand: req.body.brand,
+    image: req.body.image,
+    description: req.body.description,
+    price: req.body.price
+  }
+
+  const sql = `UPDATE products set
+    name = COALESCE(?,name),
+    brand = COALESCE(?,brand),
+    image = COALESCE(?,image),
+    description = COALESCE(?,description),
+    price = COALESCE(?,price)
+    WHERE id = ?`
+
+  const params = [
+    data.name,
+    data.brand,
+    data.image,
+    data.description,
+    data.price,
+    req.params.id
+  ]
+
+  db.run(sql, params, function (err, result) {
+    if (err) {
+      res.status(400).json({ "error": res.message })
+      return
+    }
+
+    res.json({
+      "message": "Product edited successfully",
+      data: data,
+      changes: this.changes
+    })
+  })
+})
+
+// Delete a product
+app.delete("/api/products/:id", (req, res, next) => {
+  const sql = "DELETE FROM products where id = ?"
+  const params = req.params.id
+
+  db.run(sql, params, function (err, result) {
+    if (err) {
+      res.status(400).json({ "error": res.message })
+      return
+    }
+
+    res.json({
+      "message": "Product deleted",
+      changes: this.changes
+    })
   })
 })
 
